@@ -7,6 +7,12 @@
          location permissions for the "MyLocation" functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -16,10 +22,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ByRutas"
         android:usesCleartextTraffic="true">
+        <activity android:name=".Trasarlinea"></activity>
         <activity
             android:name=".RutasActivity"
             android:label="@string/title_activity_rutas"
-            android:theme="@style/Theme.ByRutas.NoActionBar"></activity>
+            android:theme="@style/Theme.ByRutas.NoActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

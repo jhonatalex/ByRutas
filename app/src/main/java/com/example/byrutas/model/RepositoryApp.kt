@@ -32,10 +32,7 @@ class RepositoryApp (private val myDao:DaoRutas){
                 in 200..299 -> it.body()?.let {
 
 
-
-                    //val Data=convertApiToEntity(it.weatherGeneral, it.main,it.cordR,it.cloudsR,it.nubes,city)
-
-                   // val Data=convertApiToEntityPB(it.main.,city)
+                    val Data=convertApiToEntityPB(it.main, it.clouds,it.name,it.coord,it.weather)
 
                     Log.e("PRUEBABBAAAAAA", it.main.temp.toString())
                     Log.e("NUBOSIDAD", it.clouds.all.toString())
@@ -43,10 +40,8 @@ class RepositoryApp (private val myDao:DaoRutas){
                     Log.e("LATITUD", it.coord.lat.toString())
                     Log.e("LONGITUD", it.coord.lon.toString())
                     Log.e("LONGITUD", it.weather.toString())
-
-
-
-                    //myDao.insertDataWeather(Data) //-->LA GUARD EN BASE D EDATOS
+                    
+                    myDao.insertDataWeather(Data) //-->LA GUARD EN BASE D EDATOS
                 }
                 in 300..599 -> Log.e("ERROR", it.errorBody().toString())
                 else -> Log.d("ERROR", it.errorBody().toString())
@@ -67,9 +62,9 @@ class RepositoryApp (private val myDao:DaoRutas){
         }
 
 
-    private fun convertApiToEntityPB(tempParameter: Main,city:String) : DataEntity{
+    private fun convertApiToEntityPB(tempParameter: Main, cloud:Clouds, name:String, cord:Coord, desc: List<WeatherX>) : DataEntity{
 
-        return (DataEntity(     city = city,
+        return (DataEntity(     city = name,
                                 feelsLike = tempParameter.feelsLike,
                                 temp= tempParameter.temp,
                                 tempMax= tempParameter.tempMax,
@@ -77,35 +72,31 @@ class RepositoryApp (private val myDao:DaoRutas){
                                 humidity=  tempParameter.humidity,
                                 pressure=  tempParameter.pressure ,
 
-                                longitudeL= 25.5,
-                                latitudeL = 35.5,
-                                clouds=  5,
-                                cloudsDescription="Nublado",
-                                icon = "nubes.icon",
+                                longitudeL= cord.lon,
+                                latitudeL = cord.lat,
+                                clouds=  cloud.all,
+                                cloudsDescription= decodingArrayDescrip(desc),
+                                icon = decodingArrayIcon(desc),
 
                 ))
     }
 
-
-
-    private fun convertApiToEntity(father: Weather,tempParameter: Main, location: Coord, state:Clouds,
-                                   nubes:WeatherX,city:String) : DataEntity{
-
-        return (DataEntity(             city = city,
-                                        longitudeL= location.lon,
-                                        latitudeL = location.lat,
-                                        clouds=  state.all,
-                                        cloudsDescription=nubes.description,
-                                        icon = nubes.icon,
-                                        feelsLike = tempParameter.feelsLike,
-                                        temp= tempParameter.temp,
-                                        tempMax= tempParameter.tempMax,
-                                        tempMin=tempParameter.tempMin,
-                                        humidity=  tempParameter.humidity,
-                                        pressure=  tempParameter.pressure ,
-
-                                       ))
+    private fun decodingArrayDescrip(list:List<WeatherX> ):String{
+        var Parametro=""
+        list.map {
+         Parametro = it.description
+        }
+        return  Parametro
     }
+
+    private fun decodingArrayIcon(list:List<WeatherX> ):String{
+        var Parametro=""
+        list.map {
+            Parametro = it.icon
+        }
+        return  Parametro
+    }
+
 
 
 

@@ -59,7 +59,7 @@ class FirstFragment : Fragment() {
             ViewModel.requestData("$city").observe(viewLifecycleOwner, Observer {
                 Log.d("IMAGES", it.toString())
 
-               // textView_temp.text= it[0].temp.toString()
+                //textView_temp.text= it.temp.toString()
 
             })
 
