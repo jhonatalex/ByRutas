@@ -15,6 +15,10 @@ interface DaoRutas {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOneUser(user: Athlete)
 
+    @Query ("SELECT * FROM Athlete WHERE email =:emailL AND password =:contrasena")
+    fun validateUser( emailL:String, contrasena:String):LiveData<Athlete>
+
+
     @Query("SELECT * from Athlete")
     fun getAllAthlete(): LiveData<List<Athlete>>
 

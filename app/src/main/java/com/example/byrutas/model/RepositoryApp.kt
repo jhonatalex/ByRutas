@@ -2,6 +2,7 @@ package com.example.byrutas.model
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import com.example.byrutas.model.local.Athlete
 import com.example.byrutas.model.local.DaoRutas
 import com.example.byrutas.model.local.DataEntity
 import com.example.byrutas.model.remote.RetrofitApiClient
@@ -20,17 +21,28 @@ class RepositoryApp (private val myDao:DaoRutas){
     }
 
 
+    fun insertContact(athlete: Athlete)=CoroutineScope(Dispatchers.IO).launch{
+         myDao.insertOneUser(athlete)
+     }
+
+    fun login(username: String, password: String): LiveData<Athlete> {
+        return myDao.validateUser(username,password)
+    }
 
 
 
+    fun getDataFromApi()= CoroutineScope(Dispatchers.IO).launch {
 
-    fun getDataFromApi(city:String)= CoroutineScope(Dispatchers.IO).launch {
-        val service=kotlin.runCatching {  mRetrofit.getWeatherData(city)}
+        val lat=Pair("lat", "10.5112823")
+        val lon= Pair("lon", "-66.9292343")                    //aqui le pasamos  el tag
+        val map = mapOf(lat, lon)
+
+
+        val service=kotlin.runCatching {  mRetrofit.getWeatherData(map)}
 
         service.onSuccess { it ->
             when(it.code()) {
                 in 200..299 -> it.body()?.let {
-
 
                     val Data=convertApiToEntityPB(it.main, it.clouds,it.name,it.coord,it.weather)
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.byrutas">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -22,10 +23,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ByRutas"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Trasarlinea"></activity>
+        <activity android:name=".Trasarlinea"
+            tools:ignore="Instantiatable"></activity>
         <activity
-            android:name=".RutasActivity"
-            android:label="@string/title_activity_rutas"
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps"
             android:theme="@style/Theme.ByRutas.NoActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -43,8 +45,9 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:name=".RutasActivity"
+            android:label="@string/title_activity_rutas"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

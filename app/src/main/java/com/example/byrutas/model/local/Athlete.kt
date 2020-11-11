@@ -12,9 +12,8 @@ data class Athlete(
         val password: String,
         val name:String,
         val weight:Double,
-        val height:Double,
-        val gender:Char,
-        val city:String
+        val gender:Char
+
 )
 
 

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/fondosplash">
+
+    <EditText
+        android:id="@+id/editTextPersonEmail"
+        android:layout_width="255dp"
+        android:layout_height="63dp"
+        android:layout_marginStart="47dp"
+        android:layout_marginTop="370dp"
+        android:layout_marginEnd="109dp"
+        android:layout_marginBottom="298dp"
+        android:ems="10"
+        android:gravity="center_horizontal|center_vertical"
+        android:hint="Introduzca su Email"
+        android:inputType="textPersonName"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="379dp"
+        android:layout_height="229dp"
+        android:layout_marginStart="118dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="396dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/logobyrutas"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.046"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.421" />
+
+    <ImageView
+        android:id="@+id/imageView12"
+        android:layout_width="165dp"
+        android:layout_height="92dp"
+        android:layout_marginStart="114dp"
+        android:layout_marginTop="217dp"
+        android:layout_marginEnd="132dp"
+        android:layout_marginBottom="422dp"
+        android:src="@drawable/r_emailp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/next_email"
+        android:layout_width="54dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="302dp"
+        android:layout_marginTop="376dp"
+        android:layout_marginEnd="55dp"
+        android:layout_marginBottom="301dp"
+        android:clickable="true"
+        app:backgroundTint="@color/purple_200"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_send" />
+</androidx.constraintlayout.widget.ConstraintLayout>

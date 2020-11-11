@@ -2,28 +2,28 @@ package com.example.byrutas
 
 import android.Manifest
 import android.app.AlertDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
-import android.net.Uri
-
 import android.os.Bundle
-import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.os.CountDownTimer
+import android.os.SystemClock
 import android.util.Log
+import android.view.View
+import android.widget.Chronometer.OnChronometerTickListener
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.byrutas.Tools.GPS_controler
 import com.example.byrutas.Tools.Utils
-import com.google.android.gms.common.api.GoogleApi
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -31,6 +31,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,9 +40,12 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.Double
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener,GoogleMap.OnMapLongClickListener {
 
 
     private lateinit var myMap: GoogleMap
@@ -55,9 +59,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
+    private var pauseOffset: Long = 0
+    private var running = false
+
+
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-
     }
 
 
@@ -71,6 +78,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
 
 
+        chronometer.format = " %s"
+        chronometer.base = SystemClock.elapsedRealtime()
+
+
+
+        chronometer.onChronometerTickListener = OnChronometerTickListener { chronometer ->
+
+
+           // if (SystemClock.elapsedRealtime() - chronometer.base >= 10000) {
+             //   chronometer.base = SystemClock.elapsedRealtime()
+             //   Toast.makeText(this, "Bing!", Toast.LENGTH_SHORT).show()
+           // }
+        }
+
+
+
+
+
         gpsTracker = GPS_controler()
         request = Volley.newRequestQueue(applicationContext)
 
@@ -78,18 +103,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
 
+        tiempo.setOnClickListener {
 
-        ir.setOnClickListener {
-            val intento1 = Intent(this, RutasActivity::class.java)
-            startActivity(intento1)
-
+            fragmentContainer.visibility=View.VISIBLE
+            loadFragment(ClimaFragment())
         }
+
+        satelite.setOnClickListener { myMap.mapType = GoogleMap.MAP_TYPE_HYBRID }
+        hibrido.setOnClickListener { myMap.mapType = GoogleMap.MAP_TYPE_NORMAL  }
+
+
 
 
     }
 
     //METHOD STAR DE MAPS
     override fun onMapReady(googleMap: GoogleMap) {
+
+        //PERMISOSS
+        if (ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ){
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+
+            return
+        }
+
+
 
         myMap = googleMap
         myMap.mapType = GoogleMap.MAP_TYPE_NORMAL       // CAMBIA EL TIPO DE MAPA
@@ -99,34 +140,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
 
 
-
-        //PERMISOSS
-        if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-
-            return
-        }
-
-
+        //LLAMADA DE LA UBICACION ACTUAL
         fusedLocationClient.lastLocation.addOnSuccessListener(this) { locationV ->
 
             if (locationV != null) {
                 lastLocation = locationV
                 val currentLatLong = LatLng(locationV.latitude, locationV.longitude)
                 placeMarker(currentLatLong)
-                myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLong, 14f))
+                myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLong, 15f))
                 Utils.MarkerDefault(myMap, applicationContext)
-                myMap.setOnMapClickListener(this)
-                myMap.setOnMarkerClickListener(this)
+                myMap.setOnMapClickListener(this)       // CLICK
+                myMap.setOnMarkerClickListener(this)    //CLICK MARCADOR
+                myMap.setOnMapLongClickListener(this)  //CLICK LARGO MAPA
+
+
             }
         }
-
 
     }
 
@@ -137,17 +166,54 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
 
+    override fun onMapClick(p0: LatLng?) {
+       // if (p0 != null) Utils.cordenadas.originLat = p0.latitude
+      //  if (p0 != null) Utils.cordenadas.destinationLat = p0.latitude
+
+        var pointLat= p0?.latitude
+        var pointLon= p0?.longitude
+
+        onSNACK(findViewById(R.id.cordinator))
+
+
+    }
+
+    override fun onMapLongClick(p0: LatLng?) {
+        var pointLat= p0?.latitude
+        var pointLon= p0?.longitude
+
+        val currentLocation = p0?.latitude?.let { LatLng(it, p0?.longitude) }
+
+        if (currentLocation != null) {
+            placeMarkerCustom(currentLocation)
+        }
+
+        Toast.makeText(this, "Marcador Creado", Toast.LENGTH_LONG).show()
+
+    }
+
+
+
+
     //CHANGE COLOR THE POINTER
     private fun placeMarker(location: LatLng) {
         val markerOption = MarkerOptions().position(location)
-        markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+        markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         myMap.addMarker(markerOption)
 
 
     }
 
-    fun AlertShow(title: String?, latLng: LatLng) {
+    private fun placeMarkerCustom(location: LatLng) {
+        val markerOption = MarkerOptions().position(location)
+        markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.bandera_red))
+        myMap.addMarker(markerOption)
 
+    }
+
+
+
+    fun AlertShow(title: String?, latLng: LatLng) {
         if (ActivityCompat.checkSelfPermission(
                         this,
                         Manifest.permission.ACCESS_FINE_LOCATION
@@ -168,7 +234,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 }
 
         val builder = AlertDialog.Builder(this)
-        builder.setMessage("Desea ir este punto?")
+        builder.setMessage("Deseas ir este Punto?")
         builder.setTitle(title)
         builder.setCancelable(false)
         builder.setPositiveButton("Si", DialogInterface.OnClickListener { dialog, which ->
@@ -201,22 +267,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         ///TODO: CALL  A LA API
         ObtenerRuta(Utils.cordenadas.originLat.toString(), Utils.cordenadas.originLon.toString(),
-                    Utils.cordenadas.destinationLat.toString(), Utils.cordenadas.destinationLon.toString())
+                Utils.cordenadas.destinationLat.toString(), Utils.cordenadas.destinationLon.toString())
 
 
     }
 
-
-    override fun onMapClick(p0: LatLng?) {
-        if (p0 != null) Utils.cordenadas.originLat = p0.latitude
-        if (p0 != null) Utils.cordenadas.destinationLat = p0.latitude
-        Toast.makeText(this, "SELECCIONE UN MARCADOR", Toast.LENGTH_LONG).show()
-    }
 
 
     private fun ObtenerRuta(latInicial: String, lngInicial: String, latFinal: String, lngFinal: String) {
         val url =
-                "https://maps.googleapis.com/maps/api/directions/json?origin=$latInicial,$lngInicial&destination=$latFinal,$lngFinal&key=&mode=drive"
+                "https://maps.googleapis.com/maps/api/directions/json?origin=$latInicial,$lngInicial&destination=$latFinal,$lngFinal&key=AIzaSyBI6ErkeKTP4azFoDURzTSKjVCT7zjyaAU&mode=drive"
         jsonObjectRequest = JsonObjectRequest(
                 Request.Method.GET, url, null,
                 { response ->
@@ -224,7 +284,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     var jLegs: JSONArray? = null
                     var jSteps: JSONArray? = null
                     try {
-
 
                         jRoutes = response.getJSONArray("routes")
                         for (i in 0 until jRoutes.length()) {
@@ -329,6 +388,55 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
         return poly
     }
+
+
+    fun onSNACK(view: View){
+        //Snackbar(view)
+        val snackbar = Snackbar.make(view, "Manten Presionado para Añadir un Marcador",
+                Snackbar.LENGTH_LONG).setAction("Action", null)
+        snackbar.setActionTextColor(Color.BLUE)
+        val snackbarView = snackbar.view
+        snackbarView.setBackgroundColor(Color.BLACK)
+        val textView =
+                snackbarView.findViewById(R.id.snackbar_text) as TextView
+        textView.setTextColor(Color.WHITE)
+        textView.textSize = 17f
+        snackbar.show()
+    }
+
+
+
+
+    fun startChronometer(v: View?) {
+        if (!running) {
+            chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
+            chronometer.start()
+            running = true
+        }
+    }
+
+    fun pauseChronometer(v: View?) {
+        if (running) {
+            chronometer.stop()
+            pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
+            running = false
+        }
+    }
+
+    fun resetChronometer(v: View?) {
+        chronometer.base = SystemClock.elapsedRealtime()
+        pauseOffset = 0
+    }
+
+
+
+    private fun loadFragment(fragment: Fragment) {
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.add(R.id.fragmentContainer, fragment)
+        fragmentTransaction.commit()
+    }
+
+
 
 
 }

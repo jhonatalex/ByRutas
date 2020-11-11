@@ -48,8 +48,9 @@ public data class Marcadores (
         markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
         miMap.addMarker(markerOption)
 
-
     }
+
+
     fun tres(latitude:Double,longitude:Double,title:String){
 
         val point:LatLng = LatLng(latitude,longitude)
@@ -60,8 +61,9 @@ public data class Marcadores (
         markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
         miMap.addMarker(markerOption)
 
-
     }
+
+
     fun cuatro(latitude:Double,longitude:Double,title:String){
 
         val point:LatLng = LatLng(latitude,longitude)
@@ -72,8 +74,9 @@ public data class Marcadores (
         markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
         miMap.addMarker(markerOption)
 
-
     }
+
+
     fun cinco(latitude:Double,longitude:Double,title:String){
 
         val point:LatLng = LatLng(latitude,longitude)
@@ -86,4 +89,5 @@ public data class Marcadores (
 
 
     }
+
 }

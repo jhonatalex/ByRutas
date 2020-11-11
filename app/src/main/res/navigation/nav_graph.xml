@@ -3,26 +3,82 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/SecondFragment">
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.example.byrutas.FirstFragment"
+        android:name="com.example.byrutas.ClimaFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
-
-        <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_clima"/>
     <fragment
         android:id="@+id/SecondFragment"
         android:name="com.example.byrutas.SecondFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
-
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_SecondFragment_to_nameRegistroFragment"
+            app:destination="@id/nameRegistroFragment" />
+        <action
+            android:id="@+id/action_SecondFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <activity
+        android:id="@+id/mapsActivity"
+        android:name="com.example.byrutas.MapsActivity"
+        android:label="activity_maps"
+        tools:layout="@layout/activity_maps" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.byrutas.ui.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_mapsActivity"
+            app:destination="@id/mapsActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/nameRegistroFragment"
+        android:name="com.example.byrutas.zRegisterView.NameRegistroFragment"
+        android:label="fragment_name_registro"
+        tools:layout="@layout/fragment_name_registro" >
+        <action
+            android:id="@+id/action_nameRegistroFragment_to_emailRegistroFragment"
+            app:destination="@id/emailRegistroFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/emailRegistroFragment"
+        android:name="com.example.byrutas.zRegisterView.EmailRegistroFragment"
+        android:label="fragment_email_registro"
+        tools:layout="@layout/fragment_email_registro" >
+        <action
+            android:id="@+id/action_emailRegistroFragment_to_passwordRegistroFragment"
+            app:destination="@id/passwordRegistroFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/passwordRegistroFragment"
+        android:name="com.example.byrutas.zRegisterView.PasswordRegistroFragment"
+        android:label="fragment_password_registro"
+        tools:layout="@layout/fragment_password_registro" >
+        <action
+            android:id="@+id/action_passwordRegistroFragment_to_weightRegistroFragment"
+            app:destination="@id/weightRegistroFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/weightRegistroFragment"
+        android:name="com.example.byrutas.zRegisterView.WeightRegistroFragment"
+        android:label="fragment_weight_registro"
+        tools:layout="@layout/fragment_weight_registro" >
+        <action
+            android:id="@+id/action_weightRegistroFragment_to_generoRegistroFragment"
+            app:destination="@id/generoRegistroFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/generoRegistroFragment"
+        android:name="com.example.byrutas.zRegisterView.GeneroRegistroFragment"
+        android:label="fragment_genero_registro"
+        tools:layout="@layout/fragment_genero_registro" >
+        <action
+            android:id="@+id/action_generoRegistroFragment_to_SecondFragment2"
+            app:destination="@id/SecondFragment" />
     </fragment>
 </navigation>
